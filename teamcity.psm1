@@ -15,71 +15,173 @@ if ($env:TEAMCITY_VERSION) {
 	}
 }
 
-function TeamCity-Message([string]$text, [string]$status = 'NORMAL', [string]$errorDetails) {
+function Write-TCMessage {
+   param
+   (
+     [string]
+     $text,
+
+     [string]
+     $status = 'NORMAL',
+
+     [string]
+     $errorDetails
+   )
+
   $messageAttributes = @{ text=$text; status=$status }
-  
+
   if ($errorDetails) {
     $messageAttributes.errorDetails = $errorDetails
   }
-  
-	TeamCity-WriteServiceMessage 'message' $messageAttributes
+
+	Write-TCWriteServiceMessage 'message' $messageAttributes
 }
 
-function TeamCity-BlockOpened([string]$name, [string]$description) {
+function Write-TCBlockOpened {
+   param
+   (
+     [string]
+     $name,
+
+     [string]
+     $description
+   )
+
   $messageAttributes = @{ name=$name }
-  
+
   if ($description) {
     $messageAttributes.description = $description
   }
-  
-	TeamCity-WriteServiceMessage 'blockOpened' $messageAttributes
+
+	Write-TCWriteServiceMessage 'blockOpened' $messageAttributes
 }
 
-function TeamCity-BlockClosed([string]$name) {
-	TeamCity-WriteServiceMessage 'blockClosed' @{ name=$name }
+function Write-TCBlockClosed {
+   param
+   (
+     [string]
+     $name
+   )
+
+	Write-TCWriteServiceMessage 'blockClosed' @{ name=$name }
 }
 
-function TeamCity-TestSuiteStarted([string]$name) {
-	TeamCity-WriteServiceMessage 'testSuiteStarted' @{ name=$name }
+function Write-TCTestSuiteStarted {
+   param
+   (
+     [string]
+     $name
+   )
+
+	Write-TCWriteServiceMessage 'testSuiteStarted' @{ name=$name }
 }
 
-function TeamCity-TestSuiteFinished([string]$name) {
-	TeamCity-WriteServiceMessage 'testSuiteFinished' @{ name=$name }
+function Write-TCTestSuiteFinished {
+   param
+   (
+     [string]
+     $name
+   )
+
+	Write-TCWriteServiceMessage 'testSuiteFinished' @{ name=$name }
 }
 
-function TeamCity-TestStarted([string]$name) {
-	TeamCity-WriteServiceMessage 'testStarted' @{ name=$name }
+function Write-TCTestStarted {
+   param
+   (
+     [string]
+     $name
+   )
+
+	Write-TCWriteServiceMessage 'testStarted' @{ name=$name }
 }
 
-function TeamCity-TestFinished([string]$name, [int]$duration) {
+function Write-TCTestFinished {
+   param
+   (
+     [string]
+     $name,
+
+     [int]
+     $duration
+   )
+
 	$messageAttributes = @{name=$name; duration=$duration}
-	
+
 	if ($duration -gt 0) {
 		$messageAttributes.duration=$duration
 	}
 
-	TeamCity-WriteServiceMessage 'testFinished' $messageAttributes
+	Write-TCWriteServiceMessage 'testFinished' $messageAttributes
 }
 
-function TeamCity-TestIgnored([string]$name, [string]$message='') {
-	TeamCity-WriteServiceMessage 'testIgnored' @{ name=$name; message=$message }
+function Write-TCTestIgnored {
+   param
+   (
+     [string]
+     $name,
+
+     [string]
+     $message = ''
+   )
+
+	Write-TCWriteServiceMessage 'testIgnored' @{ name=$name; message=$message }
 }
 
-function TeamCity-TestOutput([string]$name, [string]$output) {
-	TeamCity-WriteServiceMessage 'testStdOut' @{ name=$name; out=$output }
+function Write-TCTestOutput {
+   param
+   (
+     [string]
+     $name,
+
+     [string]
+     $output
+   )
+
+	Write-TCWriteServiceMessage 'testStdOut' @{ name=$name; out=$output }
 }
 
-function TeamCity-TestError([string]$name, [string]$output) {
-	TeamCity-WriteServiceMessage 'testStdErr' @{ name=$name; out=$output }
+function Write-TCTestError {
+   param
+   (
+     [string]
+     $name,
+
+     [string]
+     $output
+   )
+
+	Write-TCWriteServiceMessage 'testStdErr' @{ name=$name; out=$output }
 }
 
-function TeamCity-TestFailed([string]$name, [string]$message, [string]$details='', [string]$type='', [string]$expected='', [string]$actual='') {
+function Write-TCTestFailed {
+   param
+   (
+     [string]
+     $name,
+
+     [string]
+     $message,
+
+     [string]
+     $details = '',
+
+     [string]
+     $type = '',
+
+     [string]
+     $expected = '',
+
+     [string]
+     $actual = ''
+   )
+
 	$messageAttributes = @{ name=$name; message=$message; details=$details }
 
 	if (![string]::IsNullOrEmpty($type)) {
 		$messageAttributes.type = $type
 	}
-	
+
 	if (![string]::IsNullOrEmpty($expected)) {
 		$messageAttributes.expected=$expected
 	}
@@ -87,112 +189,241 @@ function TeamCity-TestFailed([string]$name, [string]$message, [string]$details='
 		$messageAttributes.actual=$actual
 	}
 
-	TeamCity-WriteServiceMessage 'testFailed' $messageAttributes
+	Write-TCWriteServiceMessage 'testFailed' $messageAttributes
 }
 
 # See http://confluence.jetbrains.net/display/TCD5/Manually+Configuring+Reporting+Coverage
-function TeamCity-ConfigureDotNetCoverage([string]$key, [string]$value) {
-    TeamCity-WriteServiceMessage 'dotNetCoverage' @{ $key=$value }
+function Write-TCConfigureDotNetCoverage {
+   param
+   (
+     [string]
+     $key,
+
+     [string]
+     $value
+   )
+
+    Write-TCWriteServiceMessage 'dotNetCoverage' @{ $key=$value }
 }
 
-function TeamCity-ImportDotNetCoverageResult([string]$tool, [string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='dotNetCoverage'; tool=$tool; path=$path }
+function Write-TCImportDotNetCoverageResult {
+   param
+   (
+     [string]
+     $tool,
+
+     [string]
+     $path
+   )
+
+	Write-TCWriteServiceMessage 'importData' @{ type='dotNetCoverage'; tool=$tool; path=$path }
 }
 
 # See http://confluence.jetbrains.net/display/TCD5/FxCop_#FxCop_-UsingServiceMessages
-function TeamCity-ImportFxCopResult([string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='FxCop'; path=$path }
+function Write-TCImportFxCopResult {
+   param
+   (
+     [string]
+     $path
+   )
+
+	Write-TCWriteServiceMessage 'importData' @{ type='FxCop'; path=$path }
 }
 
-function TeamCity-ImportDuplicatesResult([string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='DotNetDupFinder'; path=$path }
+function Write-TCImportDuplicatesResult {
+   param
+   (
+     [string]
+     $path
+   )
+
+	Write-TCWriteServiceMessage 'importData' @{ type='DotNetDupFinder'; path=$path }
 }
 
-function TeamCity-ImportInspectionCodeResult([string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='ReSharperInspectCode'; path=$path }
+function Write-TCImportInspectionCodeResult {
+   param
+   (
+     [string]
+     $path
+   )
+
+	Write-TCWriteServiceMessage 'importData' @{ type='ReSharperInspectCode'; path=$path }
 }
 
-function TeamCity-ImportNUnitReport([string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='nunit'; path=$path }
+function Write-TCImportNUnitReport {
+   param
+   (
+     [string]
+     $path
+   )
+
+	Write-TCWriteServiceMessage 'importData' @{ type='nunit'; path=$path }
 }
 
-function TeamCity-ImportJSLintReport([string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='jslint'; path=$path }
+function Write-TCImportJSLintReport {
+   param
+   (
+     [string]
+     $path
+   )
+
+	Write-TCWriteServiceMessage 'importData' @{ type='jslint'; path=$path }
 }
 
-function TeamCity-PublishArtifact([string]$path) {
-	TeamCity-WriteServiceMessage 'publishArtifacts' $path
+function Write-TCPublishArtifact {
+   param
+   (
+     [string]
+     $path
+   )
+
+	Write-TCWriteServiceMessage 'publishArtifacts' $path
 }
 
-function TeamCity-ReportBuildStart([string]$message) {
-	TeamCity-WriteServiceMessage 'progressStart' $message
+function Write-TCReportBuildStart {
+   param
+   (
+     [string]
+     $message
+   )
+
+	Write-TCWriteServiceMessage 'progressStart' $message
 }
 
-function TeamCity-ReportBuildProgress([string]$message) {
-	TeamCity-WriteServiceMessage 'progressMessage' $message
+function Write-TCReportBuildProgress {
+   param
+   (
+     [string]
+     $message
+   )
+
+	Write-TCWriteServiceMessage 'progressMessage' $message
 }
 
-function TeamCity-ReportBuildFinish([string]$message) {
-	TeamCity-WriteServiceMessage 'progressFinish' $message
+function Write-TCReportBuildFinish {
+   param
+   (
+     [string]
+     $message
+   )
+
+	Write-TCWriteServiceMessage 'progressFinish' $message
 }
 
-function TeamCity-ReportBuildStatus([string]$status=$null, [string]$text='') {
+function Write-TCReportBuildStatus {
+   param
+   (
+     [Object]
+     $status = $null,
+
+     [string]
+     $text = ''
+   )
+
 	$messageAttributes = @{ text=$text }
 
 	if (![string]::IsNullOrEmpty($status)) {
 		$messageAttributes.status=$status
 	}
 
-	TeamCity-WriteServiceMessage 'buildStatus' $messageAttributes
+	Write-TCWriteServiceMessage 'buildStatus' $messageAttributes
 }
 
-function TeamCity-ReportBuildProblem([string]$description, [string]$identity=$null) {
+function Write-TCReportBuildProblem {
+   param
+   (
+     [string]
+     $description,
+
+     [Object]
+     $identity = $null
+   )
+
 	$messageAttributes = @{ description=$description }
 
 	if (![string]::IsNullOrEmpty($identity)) {
 		$messageAttributes.identity=$identity
 	}
 
-	TeamCity-WriteServiceMessage 'buildProblem' $messageAttributes
+	Write-TCWriteServiceMessage 'buildProblem' $messageAttributes
 }
 
-function TeamCity-SetBuildNumber([string]$buildNumber) {
-	TeamCity-WriteServiceMessage 'buildNumber' $buildNumber
+function Write-TCSetBuildNumber {
+   param
+   (
+     [string]
+     $buildNumber
+   )
+
+	Write-TCWriteServiceMessage 'buildNumber' $buildNumber
 }
 
-function TeamCity-SetParameter([string]$name, [string]$value) {
-	TeamCity-WriteServiceMessage 'setParameter' @{ name=$name; value=$value }
+function Write-TCSetParameter {
+   param
+   (
+     [string]
+     $name,
+
+     [string]
+     $value
+   )
+
+	Write-TCWriteServiceMessage 'setParameter' @{ name=$name; value=$value }
 }
 
-function TeamCity-SetBuildStatistic([string]$key, [string]$value) {
-	TeamCity-WriteServiceMessage 'buildStatisticValue' @{ key=$key; value=$value }
+function Write-TCSetBuildStatistic {
+   param
+   (
+     [string]
+     $key,
+
+     [string]
+     $value
+   )
+
+	Write-TCWriteServiceMessage 'buildStatisticValue' @{ key=$key; value=$value }
 }
 
-function TeamCity-EnableServiceMessages() {
-	TeamCity-WriteServiceMessage 'enableServiceMessages'
+function Write-TCEnableServiceMessages() {
+	Write-TCWriteServiceMessage 'enableServiceMessages'
 }
 
-function TeamCity-DisableServiceMessages() {
-	TeamCity-WriteServiceMessage 'disableServiceMessages'
+function Write-TCDisableServiceMessages() {
+	Write-TCWriteServiceMessage 'disableServiceMessages'
 }
 
-function TeamCity-CreateInfoDocument([string]$buildNumber='', [boolean]$status=$true, [string[]]$statusText=$null, [System.Collections.IDictionary]$statistics=$null) {
+function Write-TCCreateInfoDocument {
+   param
+   (
+     [string]
+     $buildNumber = '',
+
+     [Object]
+     $status = $true,
+
+     [Object]
+     $statusText = $null,
+
+     [Object]
+     $statistics = $null
+   )
+
 	$doc=New-Object xml;
 	$buildEl=$doc.CreateElement('build');
-	
+
 	if (![string]::IsNullOrEmpty($buildNumber)) {
 		$buildEl.SetAttribute('number', $buildNumber);
 	}
-	
+
 	$buildEl=$doc.AppendChild($buildEl);
-	
+
 	$statusEl=$doc.CreateElement('statusInfo');
 	if ($status) {
 		$statusEl.SetAttribute('status', 'SUCCESS');
 	} else {
 		$statusEl.SetAttribute('status', 'FAILURE');
 	}
-	
+
 	if ($statusText -ne $null) {
 		foreach ($text in $statusText) {
 			$textEl=$doc.CreateElement('text');
@@ -200,55 +431,77 @@ function TeamCity-CreateInfoDocument([string]$buildNumber='', [boolean]$status=$
 			$textEl.set_InnerText($text);
 			$textEl=$statusEl.AppendChild($textEl);
 		}
-	}	
-	
+	}
+
 	$statusEl=$buildEl.AppendChild($statusEl);
-	
+
 	if ($statistics -ne $null) {
 		foreach ($key in $statistics.Keys) {
 			$val=$statistics.$key
 			if ($val -eq $null) {
 				$val=''
 			}
-			
+
 			$statEl=$doc.CreateElement('statisticsValue');
 			$statEl.SetAttribute('key', $key);
 			$statEl.SetAttribute('value', $val.ToString());
 			$statEl=$buildEl.AppendChild($statEl);
 		}
 	}
-	
+
 	return $doc;
 }
 
-function TeamCity-WriteInfoDocument([xml]$doc) {
+function Write-TCWriteInfoDocument {
+   param
+   (
+     [xml]
+     $doc
+   )
+
 	$dir=(Split-Path $buildFile)
-	$path=(Join-Path $dir 'teamcity-info.xml')
-	
+	$path=(Join-Path $dir 'Write-TCinfo.xml')
+
 	$doc.Save($path);
 }
 
-function TeamCity-WriteServiceMessage([string]$messageName, $messageAttributesHashOrSingleValue) {
-	function escape([string]$value) {
-		([char[]] $value | 
-				%{ switch ($_) 
+function Write-TCWriteServiceMessage {
+   param
+   (
+     [string]
+     $messageName,
+
+     [Object]
+     $messageAttributesHashOrSingleValue
+   )
+
+	function escape {
+    param
+    (
+      [string]
+      $value
+    )
+
+		([char[]] $value |
+				%{ switch ($_)
 						{
-								"|" { "||" }
+								'|' { '||' }
 								"'" { "|'" }
-								"`n" { "|n" }
-								"`r" { "|r" }
-								"[" { "|[" }
-								"]" { "|]" }
-								([char] 0x0085) { "|x" }
-								([char] 0x2028) { "|l" }
-								([char] 0x2029) { "|p" }
+								"`n" { '|n' }
+								"`r" { '|r' }
+								'[' { '|[' }
+								']' { '|]' }
+								([char] 0x0085) { '|x' }
+								([char] 0x2028) { '|l' }
+								([char] 0x2029) { '|p' }
 								default { $_ }
 						}
 				} ) -join ''
 		}
 
+if ($env:TEAMCITY_VERSION) {
 	if ($messageAttributesHashOrSingleValue -is [hashtable]) {
-		$messageAttributesString = ($messageAttributesHashOrSingleValue.GetEnumerator() | 
+		$messageAttributesString = ($messageAttributesHashOrSingleValue.GetEnumerator() |
 			%{ "{0}='{1}'" -f $_.Key, (escape $_.Value) }) -join ' '
       $messageAttributesString = " $messageAttributesString"
 	} elseif ($messageAttributesHashOrSingleValue) {
@@ -256,4 +509,15 @@ function TeamCity-WriteServiceMessage([string]$messageName, $messageAttributesHa
 	}
 
 	Write-Output "##teamcity[$messageName$messageAttributesString]"
+} else {
+  	if ($messageAttributesHashOrSingleValue -is [hashtable]) {
+		$messageAttributesString = ($messageAttributesHashOrSingleValue.GetEnumerator() |
+			%{ "{0}='{1}'" -f $_.Key, $_.Value }) -join ' '
+      $messageAttributesString = " $messageAttributesString"
+	} elseif ($messageAttributesHashOrSingleValue) {
+		$messageAttributesString = (" '{0}'" -f ($messageAttributesHashOrSingleValue))
+	}
+
+  Write-Output "$messageName $messageAttributesString"
+}
 }

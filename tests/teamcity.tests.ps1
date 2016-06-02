@@ -1,266 +1,266 @@
-Import-Module ".\teamcity.psm1" -DisableNameChecking -Force
+Import-Module '.\teamcity.psm1' -DisableNameChecking -Force
 
-Describe "TeamCity-Message" {
+Describe 'Write-TCMessage' {
     It "Writes ##teamcity[message text='Build log message.' status='NORMAL']" {
-        TeamCity-Message "Build log message." | `
+        Write-TCMessage 'Build log message.' | `
           Should BeExactly "##teamcity[message text='Build log message.' status='NORMAL']"
     }
     
     It "Writes ##teamcity[message text='Exception text' status='ERROR']" {
-        TeamCity-Message "Exception text" "ERROR" | `
+        Write-TCMessage 'Exception text' 'ERROR' | `
           Should BeExactly "##teamcity[message text='Exception text' status='ERROR']"
     }
     
     It "Writes ##teamcity[message text='Exception text' errorDetails='stack trace' status='ERROR']" {
-        TeamCity-Message "Exception text" "ERROR" "stack trace" | `
+        Write-TCMessage 'Exception text' 'ERROR' 'stack trace' | `
           Should BeExactly "##teamcity[message errorDetails='stack trace' status='ERROR' text='Exception text']"
     }
 }
 
-Describe "TeamCity-BlockOpened" {
+Describe 'Write-TCBlockOpened' {
     It "Writes ##teamcity[blockOpened name='MyServiceBlock']" {
-        TeamCity-BlockOpened "MyServiceBlock" | `
+        Write-TCBlockOpened 'MyServiceBlock' | `
           Should BeExactly "##teamcity[blockOpened name='MyServiceBlock']"
     }
     
     It "Writes ##teamcity[blockOpened name='MyServiceBlock' description='Service block description.']" {
-        TeamCity-BlockOpened "MyServiceBlock" "Service block description." | `
+        Write-TCBlockOpened 'MyServiceBlock' 'Service block description.' | `
           Should BeExactly "##teamcity[blockOpened name='MyServiceBlock' description='Service block description.']"
     }
 }
 
-Describe "TeamCity-BlockClosed" {
+Describe 'Write-TCBlockClosed' {
     It "Writes ##teamcity[blockClosed name='MyServiceBlock']" {
-        TeamCity-BlockClosed "MyServiceBlock" | `
+        Write-TCBlockClosed 'MyServiceBlock' | `
           Should BeExactly "##teamcity[blockClosed name='MyServiceBlock']"
     }
 }
 
-Describe "TeamCity-WriteServiceMessage" {
+Describe 'Write-TCWriteServiceMessage' {
     It "Writes ##teamcity[message 'Single parameter message.']" {
-        TeamCity-WriteServiceMessage "message" "Single parameter message." | `
+        Write-TCWriteServiceMessage 'message' 'Single parameter message.' | `
           Should BeExactly "##teamcity[message 'Single parameter message.']"
     }
     
     It "Writes ##teamcity[message key='value']" {
-        TeamCity-WriteServiceMessage "message" @{ key = 'value'} | `
+        Write-TCWriteServiceMessage 'message' @{ key = 'value'} | `
           Should BeExactly "##teamcity[message key='value']"
     }
 }
 
-Describe "TeamCity-TestSuiteStarted" {
+Describe 'Write-TCTestSuiteStarted' {
     It "Writes ##teamcity[testSuiteStarted name='suiteName']" {
-        TeamCity-TestSuiteStarted "suiteName" | `
+        Write-TCTestSuiteStarted 'suiteName' | `
           Should BeExactly "##teamcity[testSuiteStarted name='suiteName']"
     }
 }
 
-Describe "TeamCity-TestSuiteFinished" {
+Describe 'Write-TCTestSuiteFinished' {
     It "Writes ##teamcity[testSuiteFinished name='suiteName']" {
-        TeamCity-TestSuiteFinished "suiteName" | `
+        Write-TCTestSuiteFinished 'suiteName' | `
           Should BeExactly "##teamcity[testSuiteFinished name='suiteName']"
     }
 }
 
-Describe "TeamCity-TestStarted" {
+Describe 'Write-TCTestStarted' {
     It "Writes ##teamcity[testStarted name='testName']" {
-        TeamCity-TestStarted "testName" | `
+        Write-TCTestStarted 'testName' | `
           Should BeExactly "##teamcity[testStarted name='testName']"
     }
 }
 
-Describe "TeamCity-TestFinished" {
+Describe 'Write-TCTestFinished' {
     It "Writes ##teamcity[testFinished duration='0' name='testName'] when no duration is given" {
-        TeamCity-TestFinished "testName" | `
+        Write-TCTestFinished 'testName' | `
           Should BeExactly "##teamcity[testFinished duration='0' name='testName']"
     }
     
     It "Writes ##teamcity[testFinished duration='0' name='testName'] when 0 duration is given" {
-        TeamCity-TestFinished "testName" 0 | `
+        Write-TCTestFinished 'testName' 0 | `
           Should BeExactly "##teamcity[testFinished duration='0' name='testName']"
     }
     
     It "Writes ##teamcity[testFinished duration='247' name='testName'] when 247 duration is given" {
-        TeamCity-TestFinished "testName" 247 | `
+        Write-TCTestFinished 'testName' 247 | `
           Should BeExactly "##teamcity[testFinished duration='247' name='testName']"
     }
     
     It "Writes ##teamcity[testFinished duration='-1' name='testName'] when duration is negative number" {
-        TeamCity-TestFinished "testName" -1 | `
+        Write-TCTestFinished 'testName' -1 | `
           Should BeExactly "##teamcity[testFinished duration='-1' name='testName']"
     }
 }
 
-Describe "TeamCity-TestIgnored" {
+Describe 'Write-TCTestIgnored' {
     It "Writes ##teamcity[testIgnored message='' name='testName']" {
-        TeamCity-TestIgnored "testName" | `
+        Write-TCTestIgnored 'testName' | `
           Should BeExactly "##teamcity[testIgnored message='' name='testName']"
     }
     
     It "Writes ##teamcity[testIgnored message='ignore comment' name='testName']" {
-        TeamCity-TestIgnored "testName" "ignore comment" | `
+        Write-TCTestIgnored 'testName' 'ignore comment' | `
           Should BeExactly "##teamcity[testIgnored message='ignore comment' name='testName']"
     }
 }
 
-Describe "TeamCity-TestOutput" {
+Describe 'Write-TCTestOutput' {
     It "Writes ##teamcity[testStdOut name='className.testName' out='text']" {
-        TeamCity-TestOutput "className.testName" "text" | `
+        Write-TCTestOutput 'className.testName' 'text' | `
           Should BeExactly "##teamcity[testStdOut name='className.testName' out='text']"
     }
 }
 
-Describe "TeamCity-TestError" {
+Describe 'Write-TCTestError' {
     It "Writes ##teamcity[testStdErr name='className.testName' out='error text']" {
-        TeamCity-TestError "className.testName" "error text" | `
+        Write-TCTestError 'className.testName' 'error text' | `
           Should BeExactly "##teamcity[testStdErr name='className.testName' out='error text']"
     }
 }
 
-Describe "TeamCity-TestFailed" {
+Describe 'Write-TCTestFailed' {
     It "Writes ##teamcity[testFailed message='failure message' type='comparisonFailure' actual='actual value' expected='expected value' details='message and stack trace' name='MyTest.test2']" {
-        TeamCity-TestFailed "MyTest.test2" "failure message" "message and stack trace" "comparisonFailure" "expected value" "actual value" | `
+        Write-TCTestFailed 'MyTest.test2' 'failure message' 'message and stack trace' 'comparisonFailure' 'expected value' 'actual value' | `
           Should BeExactly "##teamcity[testFailed message='failure message' type='comparisonFailure' actual='actual value' expected='expected value' details='message and stack trace' name='MyTest.test2']"
     }
 }
 
-Describe "TeamCity-ConfigureDotNetCoverage" {
+Describe 'Write-TCConfigureDotNetCoverage' {
     It "Writes ##teamcity[dotNetCoverage ncover3_home='C:\tools\ncover3']" {
-        TeamCity-ConfigureDotNetCoverage "ncover3_home" "C:\tools\ncover3" | `
+        Write-TCConfigureDotNetCoverage 'ncover3_home' 'C:\tools\ncover3' | `
           Should BeExactly "##teamcity[dotNetCoverage ncover3_home='C:\tools\ncover3']"
     }
     
     It "Writes ##teamcity[dotNetCoverage partcover_report_xslts='file.xslt=>generatedFileName.html']" {
-        TeamCity-ConfigureDotNetCoverage "partcover_report_xslts" "file.xslt=>generatedFileName.html" | `
+        Write-TCConfigureDotNetCoverage 'partcover_report_xslts' 'file.xslt=>generatedFileName.html' | `
           Should BeExactly "##teamcity[dotNetCoverage partcover_report_xslts='file.xslt=>generatedFileName.html']"
     }
 }
 
-Describe "TeamCity-ImportDotNetCoverageResult" {
+Describe 'Write-TCImportDotNetCoverageResult' {
     It "Writes ##teamcity[importData type='dotNetCoverage' tool='ncover3' path='C:\BuildAgent\work\build1\results.xml']" {
-        TeamCity-ImportDotNetCoverageResult "ncover3" "C:\BuildAgent\work\build1\results.xml" | `
+        Write-TCImportDotNetCoverageResult 'ncover3' 'C:\BuildAgent\work\build1\results.xml' | `
           Should BeExactly "##teamcity[importData path='C:\BuildAgent\work\build1\results.xml' tool='ncover3' type='dotNetCoverage']"
     }
 }
 
-Describe "TeamCity-ImportFxCopResult" {
+Describe 'Write-TCImportFxCopResult' {
     It "Writes ##teamcity[importData type='FxCop' path='C:\BuildAgent\work\results.xml']" {
-        TeamCity-ImportFxCopResult "C:\BuildAgent\work\results.xml" | `
+        Write-TCImportFxCopResult 'C:\BuildAgent\work\results.xml' | `
           Should BeExactly "##teamcity[importData type='FxCop' path='C:\BuildAgent\work\results.xml']"
     }
 }
 
-Describe "TeamCity-ImportDuplicatesResult" {
+Describe 'Write-TCImportDuplicatesResult' {
     It "Writes ##teamcity[importData type='DotNetDupFinder' path='C:\BuildAgent\work\results.xml']" {
-        TeamCity-ImportDuplicatesResult "C:\BuildAgent\work\results.xml" | `
+        Write-TCImportDuplicatesResult 'C:\BuildAgent\work\results.xml' | `
           Should BeExactly "##teamcity[importData type='DotNetDupFinder' path='C:\BuildAgent\work\results.xml']"
     }
 }
 
-Describe "TeamCity-ImportInspectionCodeResult" {
+Describe 'Write-TCImportInspectionCodeResult' {
     It "Writes ##teamcity[importData type='ReSharperInspectCode' path='C:\BuildAgent\work\results.xml']" {
-        TeamCity-ImportInspectionCodeResult "C:\BuildAgent\work\results.xml" | `
+        Write-TCImportInspectionCodeResult 'C:\BuildAgent\work\results.xml' | `
           Should BeExactly "##teamcity[importData type='ReSharperInspectCode' path='C:\BuildAgent\work\results.xml']"
     }
 }
 
-Describe "TeamCity-ImportNUnitReport" {
+Describe 'Write-TCImportNUnitReport' {
     It "Writes ##teamcity[importData type='nunit' path='C:\BuildAgent\work\results.xml']" {
-        TeamCity-ImportNUnitReport "C:\BuildAgent\work\results.xml" | `
+        Write-TCImportNUnitReport 'C:\BuildAgent\work\results.xml' | `
           Should BeExactly "##teamcity[importData type='nunit' path='C:\BuildAgent\work\results.xml']"
     }
 }
 
-Describe "TeamCity-ImportJSLintReport" {
+Describe 'Write-TCImportJSLintReport' {
     It "Writes ##teamcity[importData type='jslint' path='C:\BuildAgent\work\results.xml']" {
-        TeamCity-ImportJSLintReport "C:\BuildAgent\work\results.xml" | `
+        Write-TCImportJSLintReport 'C:\BuildAgent\work\results.xml' | `
           Should BeExactly "##teamcity[importData type='jslint' path='C:\BuildAgent\work\results.xml']"
     }
 }
 
-Describe "TeamCity-PublishArtifact" {
+Describe 'Write-TCPublishArtifact' {
     It "Writes ##teamcity[publishArtifacts 'artifacts\*.exe -> App.zip']" {
-        TeamCity-PublishArtifact "artifacts\*.exe -> App.zip" | `
+        Write-TCPublishArtifact 'artifacts\*.exe -> App.zip' | `
           Should BeExactly "##teamcity[publishArtifacts 'artifacts\*.exe -> App.zip']"
     }
 }
 
-Describe "TeamCity-ReportBuildStart" {
+Describe 'Write-TCReportBuildStart' {
     It "Writes ##teamcity[progressStart 'Compilation started']" {
-        TeamCity-ReportBuildStart "Compilation started" | `
+        Write-TCReportBuildStart 'Compilation started' | `
           Should BeExactly "##teamcity[progressStart 'Compilation started']"
     }
 }
 
-Describe "TeamCity-ReportBuildProgress" {
+Describe 'Write-TCReportBuildProgress' {
     It "Writes ##teamcity[progressMessage 'Build progress message']" {
-        TeamCity-ReportBuildProgress "Build progress message" | `
+        Write-TCReportBuildProgress 'Build progress message' | `
           Should BeExactly "##teamcity[progressMessage 'Build progress message']"
     }
 }
 
-Describe "TeamCity-ReportBuildFinish" {
+Describe 'Write-TCReportBuildFinish' {
     It "Writes ##teamcity[progressFinish 'Build finished.']" {
-        TeamCity-ReportBuildFinish "Build finished." | `
+        Write-TCReportBuildFinish 'Build finished.' | `
           Should BeExactly "##teamcity[progressFinish 'Build finished.']"
     }
 }
 
-Describe "TeamCity-ReportBuildStatus" {
+Describe 'Write-TCReportBuildStatus' {
     It "Writes ##teamcity[buildStatus text='{build.status.text}, 10/10 tests passed' status='SUCCESS']" {
-        TeamCity-ReportBuildStatus "SUCCESS" "{build.status.text}, 10/10 tests passed" | `
+        Write-TCReportBuildStatus 'SUCCESS' '{build.status.text}, 10/10 tests passed' | `
           Should BeExactly "##teamcity[buildStatus text='{build.status.text}, 10/10 tests passed' status='SUCCESS']"
     }
     
     It "Writes ##teamcity[buildStatus text='{build.status.text}, 10/10 tests passed'] without optional status attribute." {
-        TeamCity-ReportBuildStatus -text "{build.status.text}, 10/10 tests passed" | `
+        Write-TCReportBuildStatus -text '{build.status.text}, 10/10 tests passed' | `
           Should BeExactly "##teamcity[buildStatus text='{build.status.text}, 10/10 tests passed']"
     }
 }
 
-Describe "TeamCity-ReportBuildProblem" {
+Describe 'Write-TCReportBuildProblem' {
     It "Writes ##teamcity[buildProblem description='A problem occured.' identity='SOME_IDENTITY']" {
-        TeamCity-ReportBuildProblem "A problem occured." "SOME_IDENTITY" | `
+        Write-TCReportBuildProblem 'A problem occured.' 'SOME_IDENTITY' | `
           Should BeExactly "##teamcity[buildProblem description='A problem occured.' identity='SOME_IDENTITY']"
     }
     
     It "Writes ##teamcity[buildStatus text='A problem occured.'] without optional identity attribute." {
-        TeamCity-ReportBuildStatus -text "A problem occured." | `
+        Write-TCReportBuildStatus -text 'A problem occured.' | `
           Should BeExactly "##teamcity[buildStatus text='A problem occured.']"
     }
 }
 
-Describe "TeamCity-SetBuildNumber" {
+Describe 'Write-TCSetBuildNumber' {
     It "Writes ##teamcity[buildNumber '1.2.3_{build.number}-ent']" {
-        TeamCity-SetBuildNumber "1.2.3_{build.number}-ent" | `
+        Write-TCSetBuildNumber '1.2.3_{build.number}-ent' | `
           Should BeExactly "##teamcity[buildNumber '1.2.3_{build.number}-ent']"
     }
 }
 
-Describe "TeamCity-SetParameter" {
+Describe 'Write-TCSetParameter' {
     It "Writes ##teamcity[setParameter value='value1' name='system.p1']" {
-        TeamCity-SetParameter "system.p1" "value1" | `
+        Write-TCSetParameter 'system.p1' 'value1' | `
           Should BeExactly "##teamcity[setParameter value='value1' name='system.p1']"
     }
 }
 
-Describe "TeamCity-SetBuildStatistic" {
+Describe 'Write-TCSetBuildStatistic' {
     It "Writes ##teamcity[buildStatisticValue key='unittests.count' value='19']" {
-        TeamCity-SetBuildStatistic "unittests.count" "19" | `
+        Write-TCSetBuildStatistic 'unittests.count' '19' | `
           Should BeExactly "##teamcity[buildStatisticValue key='unittests.count' value='19']"
     }
 }
 
-Describe "TeamCity-EnableServiceMessages" {
-    It "Writes ##teamcity[enableServiceMessages]" {
-        TeamCity-EnableServiceMessages| `
-          Should BeExactly "##teamcity[enableServiceMessages]"
+Describe 'Write-TCEnableServiceMessages' {
+    It 'Writes ##teamcity[enableServiceMessages]' {
+        Write-TCEnableServiceMessages| `
+          Should BeExactly '##teamcity[enableServiceMessages]'
     }
 }
 
-Describe "TeamCity-DisableServiceMessages" {
-    It "Writes ##teamcity[disableServiceMessages]" {
-        TeamCity-DisableServiceMessages | `
-          Should BeExactly "##teamcity[disableServiceMessages]"
+Describe 'Write-TCDisableServiceMessages' {
+    It 'Writes ##teamcity[disableServiceMessages]' {
+        Write-TCDisableServiceMessages | `
+          Should BeExactly '##teamcity[disableServiceMessages]'
     }
 }
